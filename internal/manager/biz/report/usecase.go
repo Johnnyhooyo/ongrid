@@ -135,7 +135,7 @@ func (u *Usecase) CreateSchedule(ctx context.Context, s *model.ReportSchedule, n
 		}
 		s.CronSpec = spec
 	}
-	loc, err := loadLocation(s.Timezone)
+	loc, err := LoadLocation(s.Timezone)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func (u *Usecase) FireSchedule(ctx context.Context, s *model.ReportSchedule, fir
 	if err := u.ensureGeneratorReady(ctx); err != nil {
 		return nil, err
 	}
-	loc, err := loadLocation(s.Timezone)
+	loc, err := LoadLocation(s.Timezone)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (u *Usecase) FireSchedule(ctx context.Context, s *model.ReportSchedule, fir
 // taskRef is the owning-task back-ref (HLD-022), e.g. "report-schedule:42" when
 // invoked via a schedule's run-now; "" for a truly ad-hoc generate.
 func (u *Usecase) GenerateNow(ctx context.Context, createdBy uint64, kind, tz, scopeJSON, locale, taskRef string, period Period) (*model.Report, error) {
-	if _, err := loadLocation(tz); err != nil {
+	if _, err := LoadLocation(tz); err != nil {
 		return nil, err
 	}
 	if err := u.ensureGeneratorReady(ctx); err != nil {
@@ -294,9 +294,10 @@ func (u *Usecase) ensureGeneratorReady(ctx context.Context) error {
 	return nil
 }
 
-// loadLocation resolves a schedule timezone, defaulting to UTC on empty.
-// An unparseable tz is a config error surfaced as ErrInvalid.
-func loadLocation(tz string) (*time.Location, error) {
+// LoadLocation resolves a schedule timezone, defaulting to UTC on empty.
+// An unparseable tz is a config error surfaced as ErrInvalid. Exported so
+// the data-layer next_fire_at backfill resolves timezones identically.
+func LoadLocation(tz string) (*time.Location, error) {
 	if tz == "" {
 		return time.UTC, nil
 	}

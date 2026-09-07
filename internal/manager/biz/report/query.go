@@ -96,7 +96,7 @@ func (u *Usecase) UpdateSchedule(ctx context.Context, s *model.ReportSchedule, n
 		}
 		s.CronSpec = spec
 	}
-	loc, err := loadLocation(s.Timezone)
+	loc, err := LoadLocation(s.Timezone)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func (u *Usecase) SetScheduleEnabled(ctx context.Context, id uint64, enabled boo
 	if !enabled {
 		s.NextFireAt = nil
 	} else {
-		loc, err := loadLocation(s.Timezone)
+		loc, err := LoadLocation(s.Timezone)
 		if err != nil {
 			return nil, err
 		}
@@ -154,7 +154,7 @@ func (u *Usecase) RunNow(ctx context.Context, scheduleID uint64, locale string, 
 	if err != nil {
 		return nil, err
 	}
-	loc, err := loadLocation(s.Timezone)
+	loc, err := LoadLocation(s.Timezone)
 	if err != nil {
 		return nil, err
 	}
